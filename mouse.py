@@ -7,26 +7,42 @@ actions = []
 is_recording = False
 is_replaying = False
 is_terminated = False
+start_time = None
 
 def on_move(x, y):
     if is_recording:
-        actions.append(('move', x, y, time.time()))
+        global start_time
+        if start_time is None:
+            start_time = time.time()
+        actions.append(('move', x, y, time.time() - start_time))
 
 def on_click(x, y, button, pressed):
     if is_recording:
-        actions.append(('click', x, y, button, pressed, time.time()))
+        global start_time
+        if start_time is None:
+            start_time = time.time()
+        actions.append(('click', x, y, button, pressed, time.time() - start_time))
 
 def on_scroll(x, y, dx, dy):
     if is_recording:
-        actions.append(('scroll', x, y, dx, dy, time.time()))
+        global start_time
+        if start_time is None:
+            start_time = time.time()
+        actions.append(('scroll', x, y, dx, dy, time.time() - start_time))
 
 def on_press(key):
     if is_recording:
-        actions.append(('keypress', key, time.time()))
+        global start_time
+        if start_time is None:
+            start_time = time.time()
+        actions.append(('keypress', key, time.time() - start_time))
 
 def on_release(key):
     if is_recording:
-        actions.append(('keyrelease', key, time.time()))
+        global start_time
+        if start_time is None:
+            start_time = time.time()
+        actions.append(('keyrelease', key, time.time() - start_time))
 
 def toggle_recording():
     global is_recording
