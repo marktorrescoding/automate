@@ -9,12 +9,14 @@ is_replaying = False
 is_terminated = False
 start_time = None
 
+
 def on_move(x, y):
     if is_recording:
         global start_time
         if start_time is None:
             start_time = time.time()
         actions.append(('move', x, y, time.time() - start_time))
+
 
 def on_click(x, y, button, pressed):
     if is_recording:
@@ -23,12 +25,14 @@ def on_click(x, y, button, pressed):
             start_time = time.time()
         actions.append(('click', x, y, button, pressed, time.time() - start_time))
 
+
 def on_scroll(x, y, dx, dy):
     if is_recording:
         global start_time
         if start_time is None:
             start_time = time.time()
         actions.append(('scroll', x, y, dx, dy, time.time() - start_time))
+
 
 def on_press(key):
     if is_recording:
@@ -37,12 +41,14 @@ def on_press(key):
             start_time = time.time()
         actions.append(('keypress', key, time.time() - start_time))
 
+
 def on_release(key):
     if is_recording:
         global start_time
         if start_time is None:
             start_time = time.time()
         actions.append(('keyrelease', key, time.time() - start_time))
+
 
 def toggle_recording():
     global is_recording
@@ -57,14 +63,18 @@ def toggle_recording():
         replay_button.config(state=tk.NORMAL)
         print("Recording stopped.")
 
+
 def replay_func():
     global is_replaying
     is_replaying = True
     print("Replaying actions...")
+    last_time = 0
     for action in actions:
         if is_terminated:
             break
         action_type = action[0]
+        delay = action[-1] - last_time
+        time.sleep(delay)
         if action_type == 'move':
             _, x, y, _ = action
             mouse.Controller().position = (x, y)
@@ -83,10 +93,11 @@ def replay_func():
         elif action_type == 'keyrelease':
             _, key, _ = action
             keyboard.Controller().release(key)
-        time.sleep(0.01)
+        last_time = action[-1]
     print("Replay finished.")
     replay_button.config(state=tk.NORMAL)
     is_replaying = False
+
 
 def start_replay():
     if not is_replaying and actions:
@@ -94,10 +105,12 @@ def start_replay():
         replay_thread = threading.Thread(target=replay_func)
         replay_thread.start()
 
+
 def terminate():
     global is_terminated
     is_terminated = True
     root.destroy()
+
 
 if __name__ == "__main__":
     print("Press '1' to start/stop recording actions. Press 'x' to terminate the program.")
@@ -120,6 +133,7 @@ if __name__ == "__main__":
 
     terminate_button = tk.Button(root, text="Terminate", width=15, command=terminate)
     terminate_button.pack(pady=10)
+
     root.mainloop()
 
     print("Recording finished.")
